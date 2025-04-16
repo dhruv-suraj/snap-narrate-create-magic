@@ -48,6 +48,7 @@ export async function generateCaptionForImage(image: File, modelId?: string, cus
       reader.readAsDataURL(image);
     });
 
+    // For LLM models, we need to send a proper prompt that includes an instruction to describe the image
     const response = await fetch(`https://api-inference.huggingface.co/models/${selectedModelId}`, {
       method: "POST",
       headers: {
