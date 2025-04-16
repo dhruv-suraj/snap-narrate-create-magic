@@ -1,12 +1,34 @@
 
 import { toast } from "sonner";
 
-const API_URL = "https://api-inference.huggingface.co/models/llava-hf/llava-1.5-7b-hf";
-const API_KEY = "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";
+const STORAGE_TOKEN_KEY = 'huggingface_api_token';
+const DEFAULT_MODEL_ID = 'meta-llama/Meta-Llama-3-8B-Instruct';
 
-export async function generateCaptionForImage(image: File): Promise<string> {
+export function saveHuggingFaceToken(token: string) {
+  localStorage.setItem(STORAGE_TOKEN_KEY, token);
+  toast.success("API Token saved successfully");
+}
+
+export function getHuggingFaceToken(): string | null {
+  return localStorage.getItem(STORAGE_TOKEN_KEY);
+}
+
+export function clearHuggingFaceToken() {
+  localStorage.removeItem(STORAGE_TOKEN_KEY);
+  toast.info("API Token cleared");
+}
+
+export async function generateCaptionForImage(image: File, modelId?: string, customToken?: string): Promise<string> {
   if (!image) {
     toast.error("Please upload an image first");
+    return "";
+  }
+
+  const apiToken = customToken || getHuggingFaceToken();
+  const selectedModelId = modelId || DEFAULT_MODEL_ID;
+
+  if (!apiToken) {
+    toast.error("Please provide a Hugging Face API token");
     return "";
   }
 
@@ -16,7 +38,6 @@ export async function generateCaptionForImage(image: File): Promise<string> {
     const imageData: string = await new Promise((resolve, reject) => {
       reader.onload = (e) => {
         if (e.target?.result) {
-          // Remove the data URL prefix and get just the base64 data
           const base64Data = (e.target.result as string).split(',')[1];
           resolve(base64Data);
         } else {
@@ -27,10 +48,10 @@ export async function generateCaptionForImage(image: File): Promise<string> {
       reader.readAsDataURL(image);
     });
 
-    const response = await fetch(API_URL, {
+    const response = await fetch(`https://api-inference.huggingface.co/models/${selectedModelId}`, {
       method: "POST",
       headers: {
-        "Authorization": `Bearer ${API_KEY}`,
+        "Authorization": `Bearer ${apiToken}`,
         "Content-Type": "application/json",
       },
       body: JSON.stringify({

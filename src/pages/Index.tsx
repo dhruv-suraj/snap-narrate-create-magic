@@ -3,6 +3,7 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import ImageUploader from "@/components/ImageUploader";
 import CaptionDisplay from "@/components/CaptionDisplay";
+import { HuggingFaceTokenInput } from "@/components/HuggingFaceTokenInput";
 import { generateCaptionForImage } from "@/services/HuggingFaceService";
 import { Sparkles, GithubIcon } from "lucide-react";
 import { toast } from "sonner";
@@ -50,7 +51,7 @@ const Index = () => {
             Transform your images into detailed captions with our AI-powered image captioning tool.
           </p>
           
-          <div className="flex justify-center mt-4">
+          <div className="flex justify-center mt-4 space-x-4">
             <a 
               href="https://github.com/nishant-ai/Snap2Caption" 
               target="_blank" 
@@ -60,6 +61,7 @@ const Index = () => {
               <GithubIcon size={16} />
               <span>View on GitHub</span>
             </a>
+            <HuggingFaceTokenInput />
           </div>
         </div>
 
